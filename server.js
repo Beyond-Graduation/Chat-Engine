@@ -12,6 +12,13 @@ mongoose.connect(mongoString);
 const database = mongoose.connection;
 
 app.use(cors());
+app.use(function (req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Credentials", true);
+  next();
+});
 app.use(express.json());
 
 // database.on('error', (error) => {
@@ -29,7 +36,6 @@ const PORT = 4001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
 
 // Socket creation
 
@@ -55,7 +61,7 @@ const getUser = (userId) => {
 };
 
 io.on("connection", (socket) => {
-    // console.log("A user connected");
+  // console.log("A user connected");
 
   socket.on("addUser", (userId) => {
     addUser(userId, socket.id);
@@ -68,10 +74,12 @@ io.on("connection", (socket) => {
     const user = getUser(data.receiverId);
     const senderId = data.senderId;
     const text = data.text;
-    io.to(user.socketId).emit("getMessage", {
-      senderId,
-      text,
-    });
+    if (user) {
+      io.to(user.socketId).emit("getMessage", {
+        senderId,
+        text,
+      });
+    }
   });
 
   socket.on("disconnect", () => {

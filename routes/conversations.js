@@ -22,16 +22,16 @@ router.post("/conversations", async (req, res) => {
           .json({ error: "Users of the same type are not allowed to chat" });
       } else {
         const exists = await Conversation.find({
-          $and: [
+          $or: [
             { member: { $eq: [req.body.senderId, req.body.receiverId] } },
             { member: { $eq: [req.body.receiverId, req.body.senderId] } },
           ],
         });
-        if (!exists) {
+        if (exists.length === 0) {
           const savedConversation = await newConversation.save();
           res.status(200).json(savedConversation);
         } else {
-          res.status(400).json({ error: "Chat already exists" });
+          res.status(200).json(exists[0]);
         }
       }
     } else {

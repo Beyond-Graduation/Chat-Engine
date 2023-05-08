@@ -46,8 +46,45 @@ router.get("/conversations/:userId", async (req, res) => {
   try {
     const conversation = await Conversation.find({
       member: { $in: [req.params.userId] },
+    }).sort({ lastMessageAt: -1 });
+    res.status(200).json(conversation);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+router.post("/conversations/block", async (req, res) => {
+  try {
+    await Conversation.updateOne(
+      { _id: req.body.convId },
+      { blocked: true, blockedBy: req.body.blockedBy }
+    );
+    const conversation = await Conversation.find({
+      _id: { $eq: [req.body.convId] },
     });
     res.status(200).json(conversation);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+router.post("/conversations/unblock", async (req, res) => {
+  try {
+    var conversation = await Conversation.find({
+      _id: { $eq: [req.body.convId] },
+    });
+      if (conversation[0].blockedBy === req.body.unblockerId) {
+      await Conversation.updateOne(
+        { _id: req.body.convId },
+        { blocked: false, blockedBy: "" }
+      );
+      conversation = await Conversation.find({
+        _id: { $eq: [req.body.convId] },
+      });
+      res.status(200).json(conversation);
+    } else {
+      res.status(400).json({ error: "Chat blocked by other user" });
+    }
   } catch (err) {
     res.status(500).json(err);
   }

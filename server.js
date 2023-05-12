@@ -76,6 +76,13 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("blockUser", (userId) => {
+    const user = getUser(userId);
+    if (user) {
+      io.to(user.socketId).emit("blocked",{});
+    }
+  });
+
   socket.on("disconnect", () => {
     // console.log("a user disconnected");
     removeUser(socket.id);

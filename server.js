@@ -35,7 +35,7 @@ app.listen(PORT, () => {
 
 const io = require("socket.io")(8900, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "http://http://65.20.82.203/",
   },
 });
 
@@ -79,7 +79,7 @@ io.on("connection", (socket) => {
   socket.on("blockUser", (userId) => {
     const user = getUser(userId);
     if (user) {
-      io.to(user.socketId).emit("blocked",{});
+      io.to(user.socketId).emit("blocked", {});
     }
   });
 

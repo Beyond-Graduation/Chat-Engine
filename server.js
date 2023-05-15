@@ -35,7 +35,7 @@ app.listen(PORT, () => {
 
 const io = require("socket.io")(8900, {
   cors: {
-    origin: "http://65.20.82.203",
+    origin: "*",
   },
 });
 

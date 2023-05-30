@@ -42,8 +42,7 @@ const io = require("socket.io")(8900, {
 let users = [];
 
 const addUser = (userId, socketId) => {
-  !users.some((user) => user.userId === userId) &&
-    users.push({ userId, socketId });
+  users.push({ userId, socketId });
 };
 
 const removeUser = (socketId) => {
@@ -51,7 +50,7 @@ const removeUser = (socketId) => {
 };
 
 const getUser = (userId) => {
-  return users.find((user) => user.userId === userId);
+  return users.filter((user) => user.userId === userId);
 };
 
 io.on("connection", (socket) => {
@@ -68,18 +67,22 @@ io.on("connection", (socket) => {
     const user = getUser(data.receiverId);
     const senderId = data.senderId;
     const text = data.text;
-    if (user) {
-      io.to(user.socketId).emit("getMessage", {
-        senderId,
-        text,
+    if (user.length > 0) {
+      user.map((u) => {
+        io.to(u.socketId).emit("getMessage", {
+          senderId,
+          text,
+        });
       });
     }
   });
 
   socket.on("blockUser", (userId) => {
     const user = getUser(userId);
-    if (user) {
-      io.to(user.socketId).emit("blocked", {});
+    if (user.length > 0) {
+      user.map((u) => {
+        io.to(u.socketId).emit("blocked", {});
+      });
     }
   });
 

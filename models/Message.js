@@ -15,5 +15,10 @@ const MessageSchema = new mongoose.Schema({
     required: true,
     type: String,
   },
+
+  sentAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 module.exports = mongoose.model("Message", MessageSchema);
